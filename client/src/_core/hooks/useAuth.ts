@@ -44,20 +44,26 @@ export function useAuth(options?: UseAuthOptions) {
   const state = useMemo(() => {
     const userData = meQuery.data;
     
-    // Determine subscription status
-    // For super_admin, always active
-    // For others, check if company has active subscription
-    const subscriptionActive = userData?.role === "super_admin" ? true : false;
+    // FIXED: Proper subscription status determination
+    // - super_admin: NEVER requires subscription
+    // - staff: NEVER redirected to billing
+    // - company_admin: Must have active company subscription
+    const subscriptionActive = userData?.subscriptionActive ?? false;
 
     const userWithSubscription = userData ? {
       ...userData,
       subscriptionActive,
     } : null;
 
-    localStorage.setItem(
-      "manus-runtime-user-info",
-      JSON.stringify(userWithSubscription)
-    );
+    if (userWithSubscription) {
+      localStorage.setItem(
+        "manus-runtime-user-info",
+        JSON.stringify(userWithSubscription)
+      );
+      
+      // Log role and subscription for debugging
+      console.log(`[Auth] User: ${userData.name}, Role: ${userData.role}, Subscription: ${subscriptionActive}`);
+    }
 
     return {
       user: userWithSubscription,
