@@ -40,7 +40,7 @@ export const locationsRouter = router({
    * List all locations for company
    */
   list: protectedWithSubscriptionProcedure.query(async ({ ctx }) => {
-    if (!ctx.user.companyId) {
+    if (!ctx.user || !ctx.user.companyId) {
       throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
     }
 
@@ -53,7 +53,7 @@ export const locationsRouter = router({
   get: protectedWithSubscriptionProcedure
     .input(z.object({ id: z.number().int() }))
     .query(async ({ ctx, input }) => {
-      if (!ctx.user.companyId) {
+      if (!ctx.user || !ctx.user.companyId) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
       }
 

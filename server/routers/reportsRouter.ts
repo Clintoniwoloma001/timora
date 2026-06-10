@@ -44,15 +44,15 @@ export const reportsRouter = router({
   create: protectedWithSubscriptionProcedure
     .input(createReportSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user.companyId) {
+      if (!ctx.user || !ctx.user.companyId) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
       }
 
       const reportDate = input.reportDate ? new Date(input.reportDate) : new Date();
 
       const result = await db.createReport({
-        companyId: ctx.user.companyId,
-        userId: ctx.user.id,
+        companyId: ctx.user?.companyId || 0,
+        userId: ctx.user?.id || 0,
         type: input.type,
         title: input.title,
         content: input.content,
@@ -74,7 +74,7 @@ export const reportsRouter = router({
   get: protectedWithSubscriptionProcedure
     .input(z.object({ id: z.number().int() }))
     .query(async ({ ctx, input }) => {
-      if (!ctx.user.companyId) {
+      if (!ctx.user || !ctx.user.companyId) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
       }
 
@@ -84,7 +84,7 @@ export const reportsRouter = router({
       }
 
       // Verify user can access this report
-      if (report.userId !== ctx.user.id && ctx.user.role === "staff") {
+      if (ctx.user && report.userId !== ctx.user.id && ctx.user.role === "staff") {
         throw new TRPCError({ code: "FORBIDDEN", message: "Cannot access other users' reports" });
       }
 
@@ -97,7 +97,7 @@ export const reportsRouter = router({
   listMy: protectedWithSubscriptionProcedure
     .input(z.object({ limit: z.number().int().default(30) }))
     .query(async ({ ctx, input }) => {
-      if (!ctx.user.companyId) {
+      if (!ctx.user || !ctx.user.companyId) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
       }
 
@@ -123,7 +123,7 @@ export const reportsRouter = router({
   update: protectedWithSubscriptionProcedure
     .input(updateReportSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user.companyId) {
+      if (!ctx.user || !ctx.user.companyId) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
       }
 
@@ -162,7 +162,7 @@ export const reportsRouter = router({
   submit: protectedWithSubscriptionProcedure
     .input(submitReportSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user.companyId) {
+      if (!ctx.user || !ctx.user.companyId) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
       }
 
@@ -232,7 +232,7 @@ export const reportsRouter = router({
   delete: protectedWithSubscriptionProcedure
     .input(z.object({ id: z.number().int() }))
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user.companyId) {
+      if (!ctx.user || !ctx.user.companyId) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
       }
 

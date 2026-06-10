@@ -225,33 +225,35 @@ export const paymentRouter = router({
             existingSubscription.id,
             ctx.user.companyId,
             {
-              planType,
+              plan: planType,
               status: "active",
-              paystackReference: input.reference,
+              paystackAuthorizationCode: input.reference,
               startDate: now,
               endDate,
               renewalDate: endDate,
-              amount: plan.monthlyAmount,
+              amount: String(plan.monthlyAmount),
             }
           );
         } else {
           // Create new subscription
           await db.createSubscription({
             companyId: ctx.user.companyId,
-            planType,
+            plan: planType,
             status: "active",
-            paystackReference: input.reference,
+            paystackAuthorizationCode: input.reference,
             startDate: now,
             endDate,
             renewalDate: endDate,
-            amount: plan.monthlyAmount,
+            amount: String(plan.monthlyAmount),
+            billingCycle: "monthly",
+            currency: "USD",
           });
         }
 
         // Update company subscription status
         await db.updateCompany(ctx.user.companyId, {
           subscriptionStatus: "active",
-          subscriptionPlan: planType,
+          plan: planType,
         });
 
         return {
@@ -306,13 +308,13 @@ export const paymentRouter = router({
         id: company?.id,
         name: company?.name,
         subscriptionStatus: company?.subscriptionStatus,
-        subscriptionPlan: company?.subscriptionPlan,
+        plan: company?.plan,
         trialEndsAt: company?.trialEndsAt,
       },
       subscription: subscription
         ? {
             id: subscription.id,
-            planType: subscription.planType,
+            plan: subscription.plan,
             status: subscription.status,
             amount: subscription.amount,
             startDate: subscription.startDate,
@@ -345,11 +347,11 @@ export const paymentRouter = router({
     }
 
     await db.updateSubscription(subscription.id, ctx.user.companyId, {
-      status: "cancelled",
+      status: "inactive",
     });
 
     await db.updateCompany(ctx.user.companyId, {
-      subscriptionStatus: "cancelled",
+      subscriptionStatus: "inactive",
     });
 
     return {

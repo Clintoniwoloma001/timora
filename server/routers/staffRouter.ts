@@ -36,7 +36,7 @@ export const staffRouter = router({
    * List all staff in company
    */
   list: protectedWithSubscriptionProcedure.query(async ({ ctx }) => {
-    if (!ctx.user.companyId) {
+    if (!ctx.user || !ctx.user.companyId) {
       throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
     }
 
@@ -50,7 +50,7 @@ export const staffRouter = router({
   get: protectedWithSubscriptionProcedure
     .input(z.object({ id: z.number().int() }))
     .query(async ({ ctx, input }) => {
-      if (!ctx.user.companyId) {
+      if (!ctx.user || !ctx.user.companyId) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
       }
 
@@ -182,7 +182,7 @@ export const staffRouter = router({
    * Get staff statistics
    */
   stats: protectedWithSubscriptionProcedure.query(async ({ ctx }) => {
-    if (!ctx.user.companyId) {
+    if (!ctx.user || !ctx.user.companyId) {
       throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
     }
 
