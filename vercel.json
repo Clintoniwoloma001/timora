@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "buildCommand": "pnpm build",
+  "devCommand": "pnpm dev",
+  "installCommand": "pnpm install",
+  "framework": "vite",
+  "outputDirectory": "dist",
+  "env": {
+    "NODE_ENV": "production",
+    "VITE_APP_ID": "@VITE_APP_ID",
+    "JWT_SECRET": "@JWT_SECRET",
+    "DATABASE_URL": "@DATABASE_URL",
+    "OAUTH_SERVER_URL": "@OAUTH_SERVER_URL",
+    "OWNER_OPEN_ID": "@OWNER_OPEN_ID",
+    "BUILT_IN_FORGE_API_URL": "@BUILT_IN_FORGE_API_URL",
+    "BUILT_IN_FORGE_API_KEY": "@BUILT_IN_FORGE_API_KEY",
+    "PAYSTACK_SECRET_KEY": "@PAYSTACK_SECRET_KEY",
+    "PAYSTACK_PUBLIC_KEY": "@PAYSTACK_PUBLIC_KEY"
+  },
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  }
+}
