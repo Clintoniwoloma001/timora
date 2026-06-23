@@ -20,14 +20,19 @@ export function registerOAuthRoutes(app: Express) {
     }
 
     try {
+      console.log("[OAuth] Starting token exchange with code and state");
       const tokenResponse = await sdk.exchangeCodeForToken(code, state);
+      console.log("[OAuth] Token exchange successful, fetching user info");
       const userInfo = await sdk.getUserInfo(tokenResponse.accessToken);
+      console.log("[OAuth] User info retrieved:", { openId: userInfo.openId, email: userInfo.email });
 
       if (!userInfo.openId) {
+        console.error("[OAuth] Missing openId in user info");
         res.status(400).json({ error: "openId missing from user info" });
         return;
       }
 
+      console.log("[OAuth] Upserting user to database");
       await db.upsertUser({
         openId: userInfo.openId,
         name: userInfo.name || null,
@@ -36,18 +41,23 @@ export function registerOAuthRoutes(app: Express) {
         lastSignedIn: new Date(),
       });
 
+      console.log("[OAuth] Creating session token");
       const sessionToken = await sdk.createSessionToken(userInfo.openId, {
         name: userInfo.name || "",
         expiresInMs: ONE_YEAR_MS,
       });
 
+      console.log("[OAuth] Setting session cookie and redirecting");
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
       res.redirect(302, "/");
     } catch (error) {
-      console.error("[OAuth] Callback failed", error);
-      res.status(500).json({ error: "OAuth callback failed" });
+      console.error("[OAuth] Callback failed:", error instanceof Error ? error.message : error);
+      if (error instanceof Error) {
+        console.error("[OAuth] Stack:", error.stack);
+      }
+      res.status(500).json({ error: "OAuth callback failed", details: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 }
