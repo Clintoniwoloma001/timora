@@ -184,7 +184,7 @@ export const dashboardRouter = router({
    * Get staff dashboard summary (Staff only)
    */
   staffSummary: protectedWithSubscriptionProcedure.query(async ({ ctx }) => {
-    if (!ctx.user.companyId) {
+    if (!ctx.user || !ctx.user.companyId) {
       throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
     }
 

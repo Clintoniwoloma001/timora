@@ -390,11 +390,12 @@ export async function deleteDepartment(departmentId: number, companyId: number) 
 // ATTENDANCE OPERATIONS (TENANT-SAFE)
 // ============================================================================
 
-export async function createAttendance(attendance: InsertAttendance) {
+export async function createAttendance(attendanceData: InsertAttendance) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  return db.insert(attendance).values(attendance);
+  const result = await db.insert(attendance).values(attendanceData);
+  return result;
 }
 
 export async function getAttendanceById(attendanceId: number, companyId: number) {

@@ -1,5 +1,5 @@
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useAuth } from "@/_core/hooks/useAuth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +26,6 @@ import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
-import { useAuth } from "@/_core/hooks/useAuth";
 
 const staffMenuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },

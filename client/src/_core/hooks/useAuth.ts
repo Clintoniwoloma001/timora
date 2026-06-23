@@ -48,25 +48,19 @@ export function useAuth(options?: UseAuthOptions) {
     // - super_admin: NEVER requires subscription
     // - staff: NEVER redirected to billing
     // - company_admin: Must have active company subscription
-    const subscriptionActive = userData?.subscriptionActive ?? false;
 
-    const userWithSubscription = userData ? {
-      ...userData,
-      subscriptionActive,
-    } : null;
-
-    if (userWithSubscription) {
+    if (userData) {
       localStorage.setItem(
         "manus-runtime-user-info",
-        JSON.stringify(userWithSubscription)
+        JSON.stringify(userData)
       );
       
-      // Log role and subscription for debugging
-      console.log(`[Auth] User: ${userData.name}, Role: ${userData.role}, Subscription: ${subscriptionActive}`);
+      // Log role for debugging
+      console.log(`[Auth] User: ${userData.name}, Role: ${userData.role}`);
     }
 
     return {
-      user: userWithSubscription,
+      user: userData,
       loading: meQuery.isLoading || logoutMutation.isPending,
       error: meQuery.error ?? logoutMutation.error ?? null,
       isAuthenticated: Boolean(meQuery.data),

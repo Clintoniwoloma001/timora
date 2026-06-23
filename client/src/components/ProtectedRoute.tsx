@@ -1,5 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Navigate } from "wouter";
+import { useLocation } from "wouter";
 import { Loader2 } from "lucide-react";
 
 interface ProtectedRouteProps {
@@ -18,6 +18,7 @@ export function ProtectedRoute({
   redirectTo = "/login",
 }: ProtectedRouteProps) {
   const { user, loading, isAuthenticated } = useAuth({ redirectOnUnauthenticated: false });
+  const [, setLocation] = useLocation();
 
   // Show loading state
   if (loading) {
@@ -30,17 +31,14 @@ export function ProtectedRoute({
 
   // Not authenticated
   if (!isAuthenticated || !user) {
-    return <Navigate to={redirectTo} />;
-  }
-
-  // Check subscription status for non-super-admin users
-  if (user.role !== "super_admin" && !user.subscriptionActive) {
-    return <Navigate to="/billing" />;
+    setLocation(redirectTo);
+    return null;
   }
 
   // Check role-based access
   if (requiredRoles.length > 0 && !requiredRoles.includes(user.role)) {
-    return <Navigate to="/unauthorized" />;
+    setLocation("/unauthorized");
+    return null;
   }
 
   // Render component

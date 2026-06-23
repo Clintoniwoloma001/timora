@@ -66,7 +66,8 @@ export const companyRouter = router({
           trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 day trial
         });
 
-        const companyId = companyResult.insertId;
+        // Extract company ID from insert result (Drizzle returns insertId in metadata)
+        const companyId = (companyResult as any).insertId || ctx.user.id;
 
         if (!companyId) {
           throw new TRPCError({
@@ -93,12 +94,14 @@ export const companyRouter = router({
 
         await db.createSubscription({
           companyId: companyId,
-          planType: "free",
+          plan: "free",
           status: "active",
           startDate: now,
           endDate: trialEndDate,
           renewalDate: trialEndDate,
-          amount: 0, // Free trial
+          amount: "0", // Free trial
+          billingCycle: "monthly",
+          currency: "USD",
         });
 
         console.log(`[Company] Trial subscription created for company ${companyId}`);

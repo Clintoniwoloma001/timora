@@ -29,7 +29,7 @@ export const attendanceRouter = router({
   clockIn: protectedWithSubscriptionProcedure
     .input(clockInSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user.companyId) {
+      if (!ctx.user || !ctx.user.companyId) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
       }
 
@@ -79,7 +79,7 @@ export const attendanceRouter = router({
   clockOut: protectedWithSubscriptionProcedure
     .input(clockOutSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user.companyId) {
+      if (!ctx.user || !ctx.user.companyId) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
       }
 
@@ -123,7 +123,7 @@ export const attendanceRouter = router({
         clockOutTime,
         clockOutGpsLat: input.gpsLat,
         clockOutGpsLng: input.gpsLng,
-        totalHours: parseFloat(totalHours),
+        totalHours: totalHours,
         status: "completed",
       });
 
@@ -140,7 +140,7 @@ export const attendanceRouter = router({
    * Get today's attendance status
    */
   todayStatus: protectedWithSubscriptionProcedure.query(async ({ ctx }) => {
-    if (!ctx.user.companyId) {
+    if (!ctx.user || !ctx.user.companyId) {
       throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
     }
 
@@ -174,7 +174,7 @@ export const attendanceRouter = router({
   history: protectedWithSubscriptionProcedure
     .input(z.object({ limit: z.number().int().default(30) }))
     .query(async ({ ctx, input }) => {
-      if (!ctx.user.companyId) {
+      if (!ctx.user || !ctx.user.companyId) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Company context required" });
       }
 
